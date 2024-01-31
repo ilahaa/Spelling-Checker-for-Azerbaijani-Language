@@ -1,0 +1,1 @@
+# Spelling-Checker-for-Azerbaijani-Language
