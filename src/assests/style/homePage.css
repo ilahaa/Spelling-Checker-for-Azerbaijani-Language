@@ -3,9 +3,16 @@
 .HomePage {
     width: 100%;
     height: 100vh;
-    background-color: #1d1d1d;
+    background-image: url(../images/a.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     font-family: 'Epilogue', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 
 .carousel-container {
     display: flex;
@@ -14,13 +21,12 @@
 }
 
 .bg-img {
-    width: 100%;
-    height: 100%;
     position: absolute;
-    background-image: url(../images/bgImg.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    opacity: .2;
+    bottom: 10px;
+    left: 100px;
+}
+.shape-img{
+    width: 600px;
 }
 
 .home-main {
@@ -30,12 +36,29 @@
 }
 
 .homeLeft {
-    color: white;
+    width: 40%;
+    color: black;
+    position: relative;
+    left: -220px;
 }
 
 .homeMainImg {
     max-width: 60%;
     height: auto;
+}
+
+
+.checkNowBtn{
+    width: 150px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background-color: #ABD291;
+    color: white;
+    cursor: pointer;
+    
 }
 
 .slide {

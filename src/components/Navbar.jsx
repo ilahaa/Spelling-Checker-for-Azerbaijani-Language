@@ -8,7 +8,7 @@ const Navbar = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY >= 100) {
+            if (window.scrollY >= 200) {
                 setNavbarActive(true);
             } else {
                 setNavbarActive(false);
@@ -34,9 +34,9 @@ const Navbar = () => {
                         <span className="line line2" />
                         <span className="line line3" />
                     </div>
-                    <ul className="menu-items">
+                    {/* <ul className="menu-items">
                         <li className='myAccount'><Link to="/signIn">Hesabım</Link></li>
-                    </ul>
+                    </ul> */}
                     <h3 className='logo'>
                         <span className='first-word'>Doğru</span>
                         <span className='second-word'>Düzgün</span>

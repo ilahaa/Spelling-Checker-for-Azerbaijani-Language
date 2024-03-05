@@ -132,13 +132,95 @@ Mword2index = outputTokenizer.word_index
 
 
 
+# def predict_summary_for_long_sentences(given, max_length=30, chunk_size=2):
+
+#     result = ''
+
+#     if len(given) < max_length-2:
+#         # If the length is less than or equal to max_length, directly call the decoder function
+#         new_sample = ["< " + given + " >"]
+#         new_sample = np.array(pad_sequences(inputTokenizer.texts_to_sequences(new_sample), maxlen=max_length, padding='post'))
+
+#         result = decode_sequence(new_sample.reshape(1, max_length)).strip()  # Remove leading and trailing spaces
+
+#     else:
+#         words = given.split(' ')
+#         chunks = [words[i:i + chunk_size] for i in range(0, len(words), chunk_size)]
+
+#         final_result = []
+
+#         for i, chunk in enumerate(chunks):
+#             chunk_sentence = ' '.join(chunk)
+#             # print('chunk sentence: ', chunk_sentence)
+
+#             new_sample = ["< " + chunk_sentence + " >"]
+#             new_sample = np.array(pad_sequences(inputTokenizer.texts_to_sequences(new_sample), maxlen=max_length,
+#                                                 padding='post'))
+
+#             partial_result = decode_sequence(new_sample.reshape(1, max_length)).strip()  # Remove leading and trailing spaces
+#             # print('partial_result: ', partial_result)
+
+#             # Add space only if it's not the first chunk
+#             if i > 0:
+#                 partial_result = ' '.join(partial_result.split())
+
+#             final_result.append(partial_result)
+
+#         result = ' '.join(final_result).strip()
+
+#     return result
+
+import numpy as np
+import re
+
+def remove_emojis(data):
+    emoj = re.compile("["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        u"\U00002500-\U00002BEF"  # chinese char
+        u"\U00002702-\U000027B0"
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        u"\U0001f926-\U0001f937"
+        u"\U00010000-\U0010ffff"
+        u"\u2640-\u2642"
+        u"\u2600-\u2B55"
+        u"\u200d"
+        u"\u23cf"
+        u"\u23e9"
+        u"\u231a"
+        u"\ufe0f"  # dingbats
+        u"\u3030"
+                      "]+", re.UNICODE)
+    return re.sub(emoj, '', data)
+
+def preprocess_sentence(w):
+    # Convert the input to a string
+    w = str(w)
+
+    # Remove emojis
+    w = remove_emojis(w)
+
+    # Remove extra spaces
+    w = re.sub(r'[" "]+', " ", w)
+
+    # Prepend a start token "< " and append an end token " >"
+    w = '< ' + w.strip() + ' >'
+
+    return w
+
 def predict_summary_for_long_sentences(given, max_length=30, chunk_size=2):
 
     result = ''
 
+    # Preprocess the given sentence
+    given = preprocess_sentence(given)
+
     if len(given) < max_length-2:
         # If the length is less than or equal to max_length, directly call the decoder function
-        new_sample = ["< " + given + " >"]
+        new_sample = [given]
         new_sample = np.array(pad_sequences(inputTokenizer.texts_to_sequences(new_sample), maxlen=max_length, padding='post'))
 
         result = decode_sequence(new_sample.reshape(1, max_length)).strip()  # Remove leading and trailing spaces
@@ -151,16 +233,13 @@ def predict_summary_for_long_sentences(given, max_length=30, chunk_size=2):
 
         for i, chunk in enumerate(chunks):
             chunk_sentence = ' '.join(chunk)
-            # print('chunk sentence: ', chunk_sentence)
 
-            new_sample = ["< " + chunk_sentence + " >"]
+            new_sample = [chunk_sentence]
             new_sample = np.array(pad_sequences(inputTokenizer.texts_to_sequences(new_sample), maxlen=max_length,
                                                 padding='post'))
 
             partial_result = decode_sequence(new_sample.reshape(1, max_length)).strip()  # Remove leading and trailing spaces
-            # print('partial_result: ', partial_result)
 
-            # Add space only if it's not the first chunk
             if i > 0:
                 partial_result = ' '.join(partial_result.split())
 
@@ -169,7 +248,6 @@ def predict_summary_for_long_sentences(given, max_length=30, chunk_size=2):
         result = ' '.join(final_result).strip()
 
     return result
-
 
 
 def predictor(text: str):

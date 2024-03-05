@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "../assests/style/spellingCorrectorPage.css";
+import correctTxtImg from "../assests/images/correct-img.webp"
 
 const Corrector = () => {
   const [inputText, setInputText] = useState('');
@@ -48,35 +49,36 @@ const Corrector = () => {
 
   return (
     <>
-      <div className="line"></div>
+      {/* <div className="line"></div> */}
 
       <div className='spellingCorrectorPage'>
-        <div className="spelling-checker-box mt-5">
-          <div className="box-icons mb-2">
-            <i className="fa-regular fa-paste"></i>
-            <i className="fa-solid fa-cloud-arrow-up ml-3" style={{ marginLeft: "10px" }}></i>
+        <div className="row w-100 d-flex justify-content-around">
+          <div className="spelling-checker-box mt-5 col-xl-8 col-lg-8 col-md-8 col-sm-12 col-12">
+            <form onSubmit={handleSubmit}>
+              <textarea
+                className='textInput'
+                placeholder='Mətn əlavə edin...'
+                value={inputText}
+                onChange={handleInputChange}
+                rows="5"
+                cols="33"
+              ></textarea>
+              <button type='submit' className='checkBtn' disabled={loading}>Yoxla</button>
+            </form>
+
+            {loading && <p>Timer: {timer} seconds</p>}
           </div>
-
-          <form onSubmit={handleSubmit}>
-            <textarea
-              className='textInput'
-              placeholder='Mətn əlavə edin...'
-              value={inputText}
-              onChange={handleInputChange}
-              rows="5"
-              cols="33"
-            ></textarea>
-            <button type='submit' className='checkBtn' disabled={loading}>Yoxla</button>
-          </form>
-
-          {loading && <p>Timer: {timer} seconds</p>}
-
-          {correctedText && (
-            <div>
-              <h2>Corrected Text:</h2>
-              <p>{correctedText}</p>
+          <div className="corrected-text-box mt-5 col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12">
+            <div className="corrected-text">
+              {correctedText ? (
+                <div>
+                  <p>{correctedText}</p>
+                </div>
+              ) : (
+                <img className='correctTxtImg' width={200} src={correctTxtImg} alt="" />
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </>
