@@ -130,46 +130,6 @@ def seq2text(input_seq):
 
 Mword2index = outputTokenizer.word_index
 
-
-
-# def predict_summary_for_long_sentences(given, max_length=30, chunk_size=2):
-
-#     result = ''
-
-#     if len(given) < max_length-2:
-#         # If the length is less than or equal to max_length, directly call the decoder function
-#         new_sample = ["< " + given + " >"]
-#         new_sample = np.array(pad_sequences(inputTokenizer.texts_to_sequences(new_sample), maxlen=max_length, padding='post'))
-
-#         result = decode_sequence(new_sample.reshape(1, max_length)).strip()  # Remove leading and trailing spaces
-
-#     else:
-#         words = given.split(' ')
-#         chunks = [words[i:i + chunk_size] for i in range(0, len(words), chunk_size)]
-
-#         final_result = []
-
-#         for i, chunk in enumerate(chunks):
-#             chunk_sentence = ' '.join(chunk)
-#             # print('chunk sentence: ', chunk_sentence)
-
-#             new_sample = ["< " + chunk_sentence + " >"]
-#             new_sample = np.array(pad_sequences(inputTokenizer.texts_to_sequences(new_sample), maxlen=max_length,
-#                                                 padding='post'))
-
-#             partial_result = decode_sequence(new_sample.reshape(1, max_length)).strip()  # Remove leading and trailing spaces
-#             # print('partial_result: ', partial_result)
-
-#             # Add space only if it's not the first chunk
-#             if i > 0:
-#                 partial_result = ' '.join(partial_result.split())
-
-#             final_result.append(partial_result)
-
-#         result = ' '.join(final_result).strip()
-
-#     return result
-
 import numpy as np
 import re
 
@@ -197,21 +157,42 @@ def remove_emojis(data):
     return re.sub(emoj, '', data)
 
 def preprocess_sentence(w):
-    # Convert the input to a string
-    w = str(w)
 
     # Remove emojis
     w = remove_emojis(w)
 
     # Remove extra spaces
     w = re.sub(r'[" "]+', " ", w)
+    pattern = r'(?<=[.,!?;:])'
+    w = re.sub(pattern, ' ', w)
 
     # Prepend a start token "< " and append an end token " >"
     w = '< ' + w.strip() + ' >'
 
     return w
 
-def predict_summary_for_long_sentences(given, max_length=30, chunk_size=2):
+
+def combine_text(text_list, words):
+    result = ''
+    capitalize_next = True
+    for i, token in enumerate(text_list):
+        # Check if the token is a word or punctuation
+        if token.isalnum():
+            # If it's a word, handle capitalization and spacing
+            if capitalize_next:
+                token = token.capitalize()
+                capitalize_next = False
+            result += ' ' + token
+        else:
+            # If it's punctuation, handle spacing and capitalization for the next word
+            if token in '.?!:':
+                capitalize_next = True
+            result += token
+            
+    return result.strip()
+
+
+def predict_summary_for_long_sentences(given, max_length=30, chunk_size=3):
 
     result = ''
 
@@ -245,12 +226,39 @@ def predict_summary_for_long_sentences(given, max_length=30, chunk_size=2):
 
             final_result.append(partial_result)
 
-        result = ' '.join(final_result).strip()
+        result = ' '.join(final_result)
 
-    return result
+    return result.split(' ')
 
 
 def predictor(text: str):
     result = predict_summary_for_long_sentences(text)
+    print("RESULT:", result)
+    words_and_punctuations = re.findall(r"[\w']+|[.,!?;:]", text)
+    print("SPLIT TOKENS:",words_and_punctuations)
+    words = {}
+
+    # Collect only words from the sentence along with their indices
+    for index, token in enumerate(words_and_punctuations):
+        if token.isalpha():
+            words[index] = token
+    
+    print("WORDS:", words)
+    
+    # Replace the words in the sentence with the predicted words
+    counter = 0
+    for index in words.keys():
+        words[index] = result[counter]
+        words_and_punctuations[index] = words[index]  
+        counter += 1
+    
+    print("SPLIT TOKENS after process:",words_and_punctuations)
+    print("WORDS after process:", words)
+    
+    
+    
+    # Combine the words and punctuations into a single string
+    result = combine_text(words_and_punctuations, result)
     return result
+
     
