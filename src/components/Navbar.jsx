@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import "../assests/style/navbar.css";
-import Logo from "../assests/images/logo.png"
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
@@ -8,8 +7,8 @@ const Navbar = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY >= 200) {
-                setNavbarActive(true);
+            if (window.scrollY >= 100) {
+                setNavbarActive(true); 
             } else {
                 setNavbarActive(false);
             }

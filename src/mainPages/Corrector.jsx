@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "../assests/style/spellingCorrectorPage.css";
+import loadingGif from "../assests/images/loading.gif"
 import correctTxtImg from "../assests/images/correct-img.webp"
 
 const Corrector = () => {
@@ -31,7 +32,6 @@ const Corrector = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    setTimer(0); // Reset the timer back to 0 when the "Yoxla" button is pressed
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/spellingchecker', { text: inputText });
@@ -39,7 +39,7 @@ const Corrector = () => {
     } catch (error) {
       console.error('Error correcting text:', error);
     } finally {
-      setLoading(false); // Set loading back to false when the response is received or an error occurs
+      setLoading(false);
     }
   };
 
@@ -49,26 +49,27 @@ const Corrector = () => {
 
   return (
     <>
-      {/* <div className="line"></div> */}
-
-      <div className='spellingCorrectorPage'>
-        <div className="row w-100 d-flex justify-content-around">
-          <div className="spelling-checker-box mt-5 col-xl-8 col-lg-8 col-md-8 col-sm-12 col-12">
+      <div className='spellingCorrectorPage '>
+       
+          <div className="spelling-checker-box 
+          d-flex align-items-center justify-content-center flex-column">
             <form onSubmit={handleSubmit}>
               <textarea
                 className='textInput'
                 placeholder='Mətn əlavə edin...'
                 value={inputText}
                 onChange={handleInputChange}
-                rows="5"
-                cols="33"
               ></textarea>
               <button type='submit' className='checkBtn' disabled={loading}>Yoxla</button>
             </form>
 
-            {loading && <p>Timer: {timer} seconds</p>}
+            {loading && <img className='loadingGif' width={30} src={loadingGif} alt="Loading..." />
+            }
           </div>
-          <div className="corrected-text-box mt-5 col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12">
+           {/* <p>Timer: {timer} seconds</p> */}
+
+          <div className="corrected-text-box 
+          d-flex align-items-center justify-content-center">
             <div className="corrected-text">
               {correctedText ? (
                 <div>
@@ -80,7 +81,7 @@ const Corrector = () => {
             </div>
           </div>
         </div>
-      </div>
+
     </>
   );
 };

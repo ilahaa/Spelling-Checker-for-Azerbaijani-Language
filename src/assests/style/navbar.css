@@ -4,13 +4,13 @@
 /* font-family: 'Londrina Outline', sans-serif; */
 .myNavbar {
     background: transparent;
-    position: fixed;
-    top: 0;
+    /* position: fixed; */
+    /* top: 0; */
     width: 100%;
-    height: 14vh;
-    z-index: 1000;
-    /* border-bottom: 3px solid white; */
-    transition: background-color 0.3s ease-in-out, top 0.3s ease-in-out;
+    height: 12vh;
+    /* z-index: 1000; */
+    /* transition: background-color 0.3s ease-in-out, top 0.3s ease-in-out; */
+    transition: .5s all;
 }
 
 .first-word{
@@ -18,12 +18,16 @@
 }
 .second-word{
     font-family: 'Londrina Outline', sans-serif;
+    font-weight: bold;
 }
 
 
-.myNavbar.customActive {
-    background-color:  #999999;
-}
+/* .myNavbar.customActive .navbar {
+    background-color:  rgba(0,30,108,255);
+    color: white;
+    opacity: 1;
+    transition: .5s all;
+} */
 
 .navbar input[type="checkbox"],
 .navbar .hamburger-lines {
@@ -39,9 +43,10 @@
 .navbar {
     position: fixed;
     width: 100%;
-    color: white;
+    color: #29295b;
     opacity: 0.85;
     z-index: 100;
+    transition: .5s all;
 }
 
 .navbar-container {
