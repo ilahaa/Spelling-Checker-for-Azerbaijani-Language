@@ -23,11 +23,11 @@ model_loaded.load_weights("SpellChecker/initial/SC_model_weight.h5")
 
 with open('SpellChecker/initial/InputTokenizer.pkl', 'rb') as f:
     inputTokenizer = pickle.load(f)
-    
+
 with open('SpellChecker/initial/OutputTokenizer.pkl', 'rb') as f:
     outputTokenizer = pickle.load(f)
-    
-    
+
+
 Eindex2word = inputTokenizer.index_word
 Mindex2word = outputTokenizer.index_word
 
@@ -130,78 +130,15 @@ def seq2text(input_seq):
 
 Mword2index = outputTokenizer.word_index
 
-import numpy as np
-import re
-
-def remove_emojis(data):
-    emoj = re.compile("["
-        u"\U0001F600-\U0001F64F"  # emoticons
-        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-        u"\U0001F680-\U0001F6FF"  # transport & map symbols
-        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-        u"\U00002500-\U00002BEF"  # chinese char
-        u"\U00002702-\U000027B0"
-        u"\U00002702-\U000027B0"
-        u"\U000024C2-\U0001F251"
-        u"\U0001f926-\U0001f937"
-        u"\U00010000-\U0010ffff"
-        u"\u2640-\u2642"
-        u"\u2600-\u2B55"
-        u"\u200d"
-        u"\u23cf"
-        u"\u23e9"
-        u"\u231a"
-        u"\ufe0f"  # dingbats
-        u"\u3030"
-                      "]+", re.UNICODE)
-    return re.sub(emoj, '', data)
-
-def preprocess_sentence(w):
-
-    # Remove emojis
-    w = remove_emojis(w)
-
-    # Remove extra spaces
-    w = re.sub(r'[" "]+', " ", w)
-    pattern = r'(?<=[.,!?;:])'
-    w = re.sub(pattern, ' ', w)
-
-    # Prepend a start token "< " and append an end token " >"
-    w = '< ' + w.strip() + ' >'
-
-    return w
 
 
-def combine_text(text_list, words):
-    result = ''
-    capitalize_next = True
-    for i, token in enumerate(text_list):
-        # Check if the token is a word or punctuation
-        if token.isalnum():
-            # If it's a word, handle capitalization and spacing
-            if capitalize_next:
-                token = token.capitalize()
-                capitalize_next = False
-            result += ' ' + token
-        else:
-            # If it's punctuation, handle spacing and capitalization for the next word
-            if token in '.?!:':
-                capitalize_next = True
-            result += token
-            
-    return result.strip()
-
-
-def predict_summary_for_long_sentences(given, max_length=30, chunk_size=3):
+def predict_summary_for_long_sentences(given, max_length=30, chunk_size=2):
 
     result = ''
-
-    # Preprocess the given sentence
-    given = preprocess_sentence(given)
 
     if len(given) < max_length-2:
         # If the length is less than or equal to max_length, directly call the decoder function
-        new_sample = [given]
+        new_sample = ["< " + given + " >"]
         new_sample = np.array(pad_sequences(inputTokenizer.texts_to_sequences(new_sample), maxlen=max_length, padding='post'))
 
         result = decode_sequence(new_sample.reshape(1, max_length)).strip()  # Remove leading and trailing spaces
@@ -214,51 +151,27 @@ def predict_summary_for_long_sentences(given, max_length=30, chunk_size=3):
 
         for i, chunk in enumerate(chunks):
             chunk_sentence = ' '.join(chunk)
+            # print('chunk sentence: ', chunk_sentence)
 
-            new_sample = [chunk_sentence]
+            new_sample = ["< " + chunk_sentence + " >"]
             new_sample = np.array(pad_sequences(inputTokenizer.texts_to_sequences(new_sample), maxlen=max_length,
                                                 padding='post'))
 
             partial_result = decode_sequence(new_sample.reshape(1, max_length)).strip()  # Remove leading and trailing spaces
+            # print('partial_result: ', partial_result)
 
+            # Add space only if it's not the first chunk
             if i > 0:
                 partial_result = ' '.join(partial_result.split())
 
             final_result.append(partial_result)
 
-        result = ' '.join(final_result)
+        result = ' '.join(final_result).strip()
 
-    return result.split(' ')
+    return result
+
 
 
 def predictor(text: str):
     result = predict_summary_for_long_sentences(text)
-    print("RESULT:", result)
-    words_and_punctuations = re.findall(r"[\w']+|[.,!?;:]", text)
-    print("SPLIT TOKENS:",words_and_punctuations)
-    words = {}
-
-    # Collect only words from the sentence along with their indices
-    for index, token in enumerate(words_and_punctuations):
-        if token.isalpha():
-            words[index] = token
-    
-    print("WORDS:", words)
-    
-    # Replace the words in the sentence with the predicted words
-    counter = 0
-    for index in words.keys():
-        words[index] = result[counter]
-        words_and_punctuations[index] = words[index]  
-        counter += 1
-    
-    print("SPLIT TOKENS after process:",words_and_punctuations)
-    print("WORDS after process:", words)
-    
-    
-    
-    # Combine the words and punctuations into a single string
-    result = combine_text(words_and_punctuations, result)
     return result
-
-    
