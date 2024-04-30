@@ -16,7 +16,7 @@ const HomePage = () => {
           <span className='second-word'>Düzgün</span>
         </h3>
 
-        <Link className='aboutus' to="aboutus">Haqqımızda</Link>
+        <Link className='aboutus' to="team">Haqqımızda</Link>
 
       </div>
 

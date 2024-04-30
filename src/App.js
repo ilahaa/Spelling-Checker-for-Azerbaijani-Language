@@ -5,6 +5,7 @@ import HomePage from './mainPages/HomePage';
 import Home from "./mainPages/Home";
 import Corrector from "./mainPages/Corrector";
 import AboutUs from "./mainPages/AboutUs";
+import Team from "./mainPages/Team"
 export default function App() {
   return (
     <BrowserRouter>
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/corrector" element={<Corrector />} />
         <Route path="/aboutus" element={<AboutUs />} />
+        <Route path="/team" element={<Team />} />
     </Routes>
 </BrowserRouter>
   );
