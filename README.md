@@ -34,3 +34,4 @@ uvicorn main:app --reload
 ### Frontend
 1. Start the React development server.
 npm start
+
